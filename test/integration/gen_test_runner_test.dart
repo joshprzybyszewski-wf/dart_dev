@@ -82,6 +82,22 @@ void main() {
           path.join(browserAndVm, 'test/vm/generated_runner.html'),
           shouldFileExist: false);
     });
+
+    group('--check flag', () async {
+      test('should succeed if the runner was generated', () async {
+        Runner runner = await generateTestRunnerDocsFor(defaultConfig);
+        expect(runner.exitCode, isZero);
+        Runner checkRunner = await generateTestRunnerDocsFor(defaultConfig,
+            additionalArgs: ['--check']);
+        expect(checkRunner.exitCode, isZero);
+      });
+
+      test('should fail if the runner was not generated', () async {
+        Runner runner = await generateTestRunnerDocsFor(defaultConfig,
+            additionalArgs: ['--check']);
+        expect(runner.exitCode, isNot(0));
+      });
+    });
   });
 }
 
