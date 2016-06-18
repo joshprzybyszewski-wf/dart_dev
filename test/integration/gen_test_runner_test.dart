@@ -90,12 +90,24 @@ void main() {
         Runner checkRunner = await generateTestRunnerDocsFor(defaultConfig,
             additionalArgs: ['--check']);
         expect(checkRunner.exitCode, isZero);
+        verifyExistenceAndCleanup(
+            path.join(defaultConfig, 'test/generated_runner.dart'),
+            shouldFileExist: true);
+        verifyExistenceAndCleanup(
+            path.join(defaultConfig, 'test/generated_runner.html'),
+            shouldFileExist: false);
       });
 
       test('should fail if the runner was not generated', () async {
         Runner runner = await generateTestRunnerDocsFor(defaultConfig,
             additionalArgs: ['--check']);
         expect(runner.exitCode, isNot(0));
+        verifyExistenceAndCleanup(
+            path.join(defaultConfig, 'test/generated_runner.dart'),
+            shouldFileExist: true);
+        verifyExistenceAndCleanup(
+            path.join(defaultConfig, 'test/generated_runner.html'),
+            shouldFileExist: false);
       });
     });
   });
