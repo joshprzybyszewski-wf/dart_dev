@@ -83,7 +83,7 @@ void main() {
           shouldFileExist: false);
     });
 
-    group('--check flag', () async {
+    group('--check flag', () {
       test('should succeed if the runner was generated', () async {
         Runner runner = await generateTestRunnerDocsFor(defaultConfig);
         expect(runner.exitCode, isZero);
