@@ -25,6 +25,7 @@ const String defaultFilename = 'generated_runner';
 const bool defaultGenHtml = false;
 const bool defaultReact = true;
 const List<String> defaultHtmlHeaders = const [];
+const int defaultNumRunners = 1;
 
 enum Environment { vm, browser, both }
 
@@ -37,6 +38,7 @@ class TestRunnerConfig {
   String filename = defaultFilename;
   bool genHtml = defaultGenHtml;
   List<String> htmlHeaders = defaultHtmlHeaders;
+  int numRunners = defaultNumRunners;
 
   TestRunnerConfig(
       {List<String> this.dartHeaders: defaultDartHeaders,
@@ -45,7 +47,8 @@ class TestRunnerConfig {
       Environment this.env: defaultEnv,
       String this.filename: defaultFilename,
       bool this.genHtml: defaultGenHtml,
-      List<String> this.htmlHeaders: defaultHtmlHeaders});
+      List<String> this.htmlHeaders: defaultHtmlHeaders,
+      int this.numRunners: defaultNumRunners});
 }
 
 class GenTestRunnerConfig extends TaskConfig {

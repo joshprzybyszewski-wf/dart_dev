@@ -86,7 +86,7 @@ class GenTestRunnerCli extends TaskCli {
       var failedFiles = '';
       for (var task in results.tasks) {
         if (!task.successful) {
-          failedFiles += ' ${task.runnerFile}';
+          failedFiles += ' ${task.runnerFiles.join(', ')}';
         }
       }
       return new CliResult.fail('Failed to generate test runner.'
@@ -107,7 +107,7 @@ class GenTestRunnerCli extends TaskCli {
           resultMessage += 'Found test dart file: $filename\n';
         });
         resultMessage +=
-            '\nCreated runner file: ${results.tasks[i].runnerFile}\n';
+            '\nCreated runner file: ${results.tasks[i].runnerFiles.join(', ')}\n';
       }
       return new CliResult.success('$resultMessage\nTest runner generated');
     }
