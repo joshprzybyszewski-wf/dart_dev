@@ -32,7 +32,6 @@ class TaskProcess {
       return;
     }
     _procExitCode.complete(1);
-    kill();
   }
 
   StreamController<String> _stdout = new StreamController();
