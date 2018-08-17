@@ -21,13 +21,14 @@ class TaskRunnerCli extends TaskCli {
   @override
   Future<CliResult> run(ArgResults parsedArgs, {bool color: true}) async {
     List<String> tasksToRun = config.taskRunner.tasksToRun;
+    Duration taskTimeout = config.taskRunner.taskTimeout;
 
     if (tasksToRun.isEmpty) {
       return new CliResult.fail(
           'There are no currently defined tasks in your dev.dart file.');
     }
 
-    TaskRunner task = await runTasks(tasksToRun);
+    TaskRunner task = await runTasks(tasksToRun, taskTimeout: taskTimeout);
 
     reporter.logGroup('Tasks run: \'${tasksToRun.join('\', \'')}\'');
     if (!task.successful) {

@@ -4,8 +4,8 @@ import 'package:dart_dev/util.dart' show reporter, TaskProcess;
 
 import 'package:dart_dev/src/tasks/task.dart';
 
-Future<TaskRunner> runTasks(tasksToRun) async {
-  var taskGroup = new TaskGroup(tasksToRun);
+Future<TaskRunner> runTasks(tasksToRun, {Duration taskTimeout}) async {
+  var taskGroup = new TaskGroup(tasksToRun, taskTimeout: taskTimeout);
   await taskGroup.run();
 
   TaskRunner task = new TaskRunner(taskGroup.failedTask, taskGroup.successful,
@@ -46,10 +46,10 @@ class SubTask {
 
   /// Starts the provided subtask and wires up a stream to allow
   /// the TaskGroup to listen for subtask completion.
-  startProcess() {
+  startProcess({Duration taskTimeout}) {
     var taskArguments = command.split(' ');
-    taskProcess =
-        new TaskProcess(taskArguments.first, taskArguments.sublist(1));
+    taskProcess = new TaskProcess(taskArguments.first, taskArguments.sublist(1),
+        timeout: taskTimeout);
 
     final stdoutc = new Completer<Null>();
     final stderrc = new Completer<Null>();
@@ -82,10 +82,12 @@ class TaskGroup {
   /// Status of TaskGroup
   bool successful = true;
 
+  Duration taskTimeout;
+
   /// Tasks cancelled prior to completion
   List<String> tasksNotCompleted = [];
 
-  TaskGroup(this.subTaskCommands) {
+  TaskGroup(this.subTaskCommands, {this.taskTimeout}) {
     for (String taskCommand in subTaskCommands) {
       SubTask task = new SubTask(taskCommand);
       subTasks.add(task);
@@ -99,7 +101,7 @@ class TaskGroup {
       reporter.log('Tasks running...');
     });
     for (SubTask task in subTasks) {
-      task.startProcess();
+      task.startProcess(taskTimeout: taskTimeout);
       task.done.then((_) async {
         final exitCode = await task.taskProcess.exitCode;
         reporter.log(task.taskOutput);

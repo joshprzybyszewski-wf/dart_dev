@@ -8,4 +8,5 @@ const List<String> defaultTasks = const [
 
 class TaskRunnerConfig extends TaskConfig {
   List<String> tasksToRun = defaultTasks;
+  Duration taskTimeout;
 }

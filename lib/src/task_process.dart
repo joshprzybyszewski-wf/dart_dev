@@ -26,12 +26,25 @@ class TaskProcess {
   Completer _outc = new Completer();
   Completer<int> _procExitCode = new Completer();
   Process _process;
+  Timer _timer;
+  void _onTimeout() {
+    if (_procExitCode.isCompleted) {
+      return;
+    }
+    _procExitCode.complete(1);
+    kill();
+  }
 
   StreamController<String> _stdout = new StreamController();
   StreamController<String> _stderr = new StreamController();
 
   TaskProcess(String executable, List<String> arguments,
-      {String workingDirectory, Map<String, String> environment}) {
+      {String workingDirectory,
+      Map<String, String> environment,
+      Duration timeout}) {
+    if (timeout != null) {
+      _timer = new Timer(timeout, _onTimeout);
+    }
     Process
         .start(executable, arguments,
             workingDirectory: workingDirectory, environment: environment)
@@ -47,7 +60,13 @@ class TaskProcess {
           .listen(_stderr.add, onDone: _errc.complete);
       _outc.future.then((_) => _stdout.close());
       _errc.future.then((_) => _stderr.close());
-      process.exitCode.then(_procExitCode.complete);
+      process.exitCode.then((value) {
+        if (_procExitCode.isCompleted) {
+          return;
+        }
+        _procExitCode.complete(value);
+        _timer?.cancel();
+      });
       Future.wait([_outc.future, _errc.future, process.exitCode]).then(
           (_) => _donec.complete());
     });
