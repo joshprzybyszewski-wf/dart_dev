@@ -36,17 +36,19 @@ class SubTask {
   /// Any output created in the subtask's stderr
   String taskError = '';
 
+  Duration taskTimeout;
+
   TaskProcess taskProcess;
 
   Completer<Null> _done = new Completer<Null>();
 
-  SubTask(this.command);
+  SubTask(this.command, this.taskTimeout);
 
   Future<Null> get done => _done.future;
 
   /// Starts the provided subtask and wires up a stream to allow
   /// the TaskGroup to listen for subtask completion.
-  startProcess({Duration taskTimeout}) {
+  startProcess() {
     var taskArguments = command.split(' ');
     taskProcess = new TaskProcess(taskArguments.first, taskArguments.sublist(1),
         timeout: taskTimeout);
@@ -89,7 +91,7 @@ class TaskGroup {
 
   TaskGroup(this.subTaskCommands, {this.taskTimeout}) {
     for (String taskCommand in subTaskCommands) {
-      SubTask task = new SubTask(taskCommand);
+      SubTask task = new SubTask(taskCommand, taskTimeout);
       subTasks.add(task);
     }
   }
@@ -101,7 +103,7 @@ class TaskGroup {
       reporter.log('Tasks running...');
     });
     for (SubTask task in subTasks) {
-      task.startProcess(taskTimeout: taskTimeout);
+      task.startProcess();
       task.done.then((_) async {
         final exitCode = await task.taskProcess.exitCode;
         reporter.log(task.taskOutput);
